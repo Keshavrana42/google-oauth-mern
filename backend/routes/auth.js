@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "passport";
+import User from "../models/user.js";
 import { ensureAuthenticated } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -22,7 +23,6 @@ router.get(
     failureMessage: true,
   }),
   (req, res) => {
-    // Successful login -> redirect to frontend dashboard
     res.redirect(`${CLIENT_URL}/dashboard`);
   }
 );
@@ -33,6 +33,29 @@ router.get("/current_user", (req, res) => {
     return res.status(200).json({ user: req.user });
   }
   return res.status(200).json({ user: null });
+});
+
+// Update profile (displayName, bio) - only these two fields are editable
+router.patch("/profile", ensureAuthenticated, async (req, res, next) => {
+  try {
+    const { displayName, bio } = req.body;
+
+    const updates = {};
+    if (typeof displayName === "string") {
+      updates.displayName = displayName.trim().slice(0, 50);
+    }
+    if (typeof bio === "string") {
+      updates.bio = bio.trim().slice(0, 160);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+    });
+
+    return res.status(200).json({ user: updatedUser });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Logout - destroys session

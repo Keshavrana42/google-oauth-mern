@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // true while checking session on load
+  const [loading, setLoading] = useState(true);
 
   const fetchCurrentUser = useCallback(async () => {
     try {
@@ -18,7 +18,6 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Check session status once when the app first loads / on refresh
   useEffect(() => {
     fetchCurrentUser();
   }, [fetchCurrentUser]);
@@ -28,7 +27,13 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const value = { user, loading, logout, refetchUser: fetchCurrentUser };
+  const updateProfile = async ({ displayName, bio }) => {
+    const res = await api.patch("/api/auth/profile", { displayName, bio });
+    setUser(res.data.user);
+    return res.data.user;
+  };
+
+  const value = { user, loading, logout, updateProfile, refetchUser: fetchCurrentUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

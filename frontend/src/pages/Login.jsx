@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { API_URL } from "../api/axios.js";
 import Loader from "../components/Loader.jsx";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 
 export default function Login() {
   const { user, loading } = useAuth();
@@ -28,8 +29,9 @@ export default function Login() {
     return <Loader label="Loading..." />;
   }
 
-  return (
+ return (
     <div className="page-center">
+      <ThemeToggle />
       <div className="card">
         <h1>Welcome</h1>
         <p className="subtitle">Sign in to access your dashboard</p>
