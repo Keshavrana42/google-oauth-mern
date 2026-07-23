@@ -1,8 +1,8 @@
-import "dotenv/config"; 
+import "dotenv/config"; // must be the first import so env vars are ready before other files read them
 
 import dns from "dns";
-
-
+// Force Node's resolver to use Google's public DNS. Some Windows setups
+// fail to resolve MongoDB Atlas addresses otherwise.
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 import express from "express";
@@ -19,7 +19,7 @@ app.set("trust proxy", 1);
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
-
+// --- Middleware ---
 app.use(express.json());
 app.use(
   cors({
@@ -28,7 +28,7 @@ app.use(
   })
 );
 
-
+// --- Session (persisted in MongoDB so it survives server restarts) ---
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -39,7 +39,7 @@ app.use(
       collectionName: "sessions",
     }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, 
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -47,24 +47,24 @@ app.use(
   })
 );
 
-
+// --- Passport ---
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+// --- Routes ---
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("Google OAuth backend is running.");
 });
 
-
+// --- Error handler ---
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ message: "Something went wrong on the server." });
 });
 
-
+// --- Connect to MongoDB and start server ---
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

@@ -1,3 +1,4 @@
+// Middleware to protect routes that require authentication
 export const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
     return next();
