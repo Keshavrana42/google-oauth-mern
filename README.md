@@ -1,4 +1,4 @@
-# Google OAuth Authentication (MERN + Passport.js Sessions)
+# Google OAuth Authentication (MERN + Passport.js Sessions)     🔗 **Live Demo:** https://google-oauth-mern-seven.vercel.app
 
 A full MERN application that lets users log in with their Google account via **Passport.js**, using
 **server-side sessions** (no JWT) stored in MongoDB.
